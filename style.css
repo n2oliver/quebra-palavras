@@ -1,0 +1,112 @@
+body {
+    background: #f0f0f0;
+    background-image: url(../combo-memo/components/platform/wood.jpg);
+    background-size: auto 100%;
+    background-position: center;
+    background-repeat: repeat;
+    font-family: Arial, sans-serif;
+}
+
+.game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: auto;
+    margin-bottom: 64px;
+}
+
+.game-title {
+    font-size: 2rem;
+    color: #333;
+    text-align: center;
+    font-family: Ubuntu;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 0;
+    background: #f8f3e7;
+    border-radius: 0;
+    box-shadow: 0 0 0 16px #b8864b, 0 0 0 24px #e2c48d, 2px 2px 12px rgba(0, 0, 0, 0.12);
+    max-width: 600px;
+    width: 100vw;
+    margin: 0 auto;
+    box-sizing: border-box;
+    border: 8px solid #b8864b;
+}
+
+.cell {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    min-width: 32px;
+    min-height: 32px;
+    background: #fffbe9;
+    border: 2px solid #b8864b;
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(1.2rem, 4vw, 2rem);
+    font-weight: bold;
+    color: #333;
+    cursor: grab;
+    user-select: none;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+
+.cell.empty {
+    background: #f8f8f8;
+    border: 2px dashed #bbb;
+    cursor: pointer;
+}
+
+.cell.dragging {
+    background: #d1eaff;
+    box-shadow: 0 0 8px #2196f3;
+}
+
+.instructions {
+    margin: 1rem 0;
+    color: #555;
+    background-color: #fff;
+    padding: 24px;
+    border-radius: 0;
+}
+
+.word {
+    margin-top: 1rem;
+    font-size: 1.2rem;
+    color: #2196f3;
+    font-weight: bold;
+    max-width: 600px;
+    width: 100vw;
+    margin: 0 auto;
+    padding: 14px;
+    box-sizing: border-box;
+    position: sticky;
+    top: -32px;
+    z-index: 1;
+    background-color: rgba(255,255,255,0.7);
+}
+.navbar img {
+    width: 32px;
+}
+.navbar {
+    font-family: Ubuntu;
+    max-width: 600px;
+}
+header {
+    margin: 0 auto !important;
+    max-width: 600px;
+    width: 100%;
+    margin-top: 24px !important;
+}
+footer {
+    max-width: 600px;
+    width: 100%;
+}
