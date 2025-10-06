@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Caixa de Letras | n2oliver</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="/styles-index.css" />
     <link rel="stylesheet" href="/sobre-mim.css" />
@@ -36,7 +37,7 @@
         <div class="game-title text-dark bg-warning m-auto"><strong>Caixa de Letras</strong></div>
         <div class="instructions"><strong>Arraste ou clique para mover as letras. Encontre palavras comuns do português brasileiro!</strong>
             <div class="botoes text-center">
-                <button id="btnRestart" class="btn btn-warning" onclick="window.location.reload()"><strong>Reiniciar</strong></button>
+                <button id="btnRestart" class="btn btn-warning" onclick="window.location.reload()"><strong id="reiniciar">Carregando...</strong><i class="fas fa-spinner fa-spin"></i></button>
             </div>
         </div>
         

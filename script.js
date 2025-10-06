@@ -29,7 +29,7 @@ function shuffle(array) {
 shuffle(letras);
 let grid = letras;
 
-function renderGrid() {
+async function renderGrid() {
     const gridEl = document.getElementById('grid');
     gridEl.innerHTML = "";
     grid.forEach((letter, idx) => {
@@ -46,6 +46,7 @@ function renderGrid() {
         gridEl.appendChild(cell);
     });
     showWords();
+    return true;
 }
 
 let draggedIdx = null;
@@ -134,4 +135,8 @@ function showWords() {
     });
     wordEl.innerHTML = '<b>Palavras para encontrar:</b> ' + formed.join(", ");
 }
-window.onload = renderGrid;
+window.onload = async () => {
+    await renderGrid();
+    document.getElementById('reiniciar').textContent = 'Reiniciar';
+    document.querySelector('.fa-spinner').style.display = 'none';
+}
