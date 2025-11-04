@@ -1,9 +1,28 @@
 
-// Palavras para o grid 5x5
-let listaPalavras = [
-    ["CASA", "VIDA", "PAZ", "SONHO", "LIVRO"],
-    ["CASA", "VIDA", "PAZ"]
-];
+// Word lists per language. We'll read <html lang="xx"> and pick the appropriate list.
+const wordsByLang = {
+    pt: [
+        ["CASA", "VIDA", "PAZ", "SONHO", "LIVRO"],
+        ["CASA", "VIDA", "PAZ"]
+    ],
+    en: [
+        ["HOME", "LIFE", "PEACE", "DREAM", "BOOK"],
+        ["HOME", "LIFE", "PEACE"]
+    ]
+};
+
+// Provide fallbacks for other languages supported by the gtranslate widget.
+// If we don't have a translated set, fall back to Portuguese list to avoid showing empty content.
+const extraLangFallbacks = ['fr','it','es','ru','ro','sr','zh','ja','nl','bn','id','ur'];
+extraLangFallbacks.forEach(code => { if (!wordsByLang[code]) wordsByLang[code] = wordsByLang.pt; });
+
+function getInitialWordsForLang() {
+    const lang = (document.documentElement.lang || navigator.language || 'pt').split('-')[0];
+    const candidate = wordsByLang[lang] || wordsByLang.pt;
+    return candidate; // return the array-of-arrays for this language
+}
+
+let listaPalavras = getInitialWordsForLang();
 let palavras = listaPalavras[0];
 let letras = palavras.join("").split("");
 if (letras.length > 24) {
@@ -137,6 +156,34 @@ function showWords() {
 }
 window.onload = async () => {
     await renderGrid();
-    document.getElementById('reiniciar').textContent = 'Reiniciar';
+    // localized restart label
+    const lang = (document.documentElement.lang || navigator.language || 'pt').split('-')[0];
+    const restartLabel = (lang === 'en') ? 'Restart' : 'Reiniciar';
+    document.getElementById('reiniciar').textContent = restartLabel;
     document.querySelector('.fa-spinner').style.display = 'none';
 }
+
+// Watch for language changes and re-render with new words
+const observer = new MutationObserver(mutations => {
+    for (const m of mutations) {
+        if (m.attributeName === 'lang') {
+            // rebuild word lists and grid for new language
+            listaPalavras = getInitialWordsForLang();
+            palavras = listaPalavras[0];
+            letras = palavras.join("").split("");
+            // refill extras and re-render
+            while (letras.length < 24) {
+                letras.push(extras[Math.floor(Math.random() * extras.length)]);
+            }
+            while (letras.length > 24) letras.pop();
+            letras.push("");
+            shuffle(letras);
+            renderGrid();
+            // update restart label
+            const newLang = (document.documentElement.lang || navigator.language || 'pt').split('-')[0];
+            document.getElementById('reiniciar').textContent = (newLang === 'en') ? 'Restart' : 'Reiniciar';
+            break;
+        }
+    }
+});
+observer.observe(document.documentElement, { attributes: true });
