@@ -1,5 +1,6 @@
-
-// Word lists per language. We'll read <html lang="xx"> and pick the appropriate list.
+// ===============================
+// 1. LISTAS DE PALAVRAS POR IDIOMA
+// ===============================
 const wordsByLang = {
     pt: [
         ["CASA", "VIDA", "PAZ", "SONHO", "LIVRO"],
@@ -11,21 +12,23 @@ const wordsByLang = {
     ]
 };
 
-// Provide fallbacks for other languages supported by the gtranslate widget.
-// If we don't have a translated set, fall back to Portuguese list to avoid showing empty content.
+// Idiomas extras compatíveis com gTranslate — fallback para português
 const extraLangFallbacks = ['fr','it','es','ru','ro','sr','zh','ja','nl','bn','id','ur'];
 extraLangFallbacks.forEach(code => { if (!wordsByLang[code]) wordsByLang[code] = wordsByLang.pt; });
 
 function getInitialWordsForLang() {
     const lang = (document.documentElement.lang || navigator.language || 'pt').split('-')[0];
     const candidate = wordsByLang[lang] || wordsByLang.pt;
-    return candidate; // return the array-of-arrays for this language
+    return candidate;
 }
 
+// Inicialização
 let listaPalavras = getInitialWordsForLang();
 let palavras = listaPalavras[0];
 
-// Helper: shuffle in-place
+// ===============================
+// 2. FUNÇÕES DE APOIO
+// ===============================
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -35,12 +38,13 @@ function shuffle(array) {
 
 const extras = "ABCDEFGHIJKLMNOPQRSTUVWXZ".split("");
 
-// Try to place words into a 5x5 grid so they are immediately formable (horizontally or vertically).
+// ===============================
+// 3. CONSTRUÇÃO DO GRID
+// ===============================
 function buildGridWithPlacements(words, size = 5) {
-    // grid cells initialized to null (empty)
     const grid = Array(size * size).fill(null);
     const placedWords = [];
-    const placedPositions = {}; // word -> array of indices
+    const placedPositions = {};
 
     const wordsToTry = [...words];
     shuffle(wordsToTry);
@@ -48,10 +52,9 @@ function buildGridWithPlacements(words, size = 5) {
     for (const word of wordsToTry) {
         const w = String(word).toUpperCase();
         const len = w.length;
-        if (len > size) continue; // cannot place
+        if (len > size) continue;
 
         let placed = false;
-        // try some random attempts
         for (let attempt = 0; attempt < 50 && !placed; attempt++) {
             const horiz = Math.random() < 0.5;
             const maxRow = horiz ? size - 1 : size - len;
@@ -59,7 +62,6 @@ function buildGridWithPlacements(words, size = 5) {
             const row = Math.floor(Math.random() * (maxRow + 1));
             const col = Math.floor(Math.random() * (maxCol + 1));
 
-            // compute indices
             const indices = [];
             let ok = true;
             for (let k = 0; k < len; k++) {
@@ -76,7 +78,6 @@ function buildGridWithPlacements(words, size = 5) {
             }
             if (!ok) continue;
 
-            // place the word
             for (let k = 0; k < len; k++) {
                 grid[indices[k]] = w[k];
             }
@@ -86,12 +87,12 @@ function buildGridWithPlacements(words, size = 5) {
         }
     }
 
-    // Fill remaining nulls with random extras
+    // Preenche vazios
     for (let i = 0; i < grid.length; i++) {
         if (grid[i] === null) grid[i] = extras[Math.floor(Math.random() * extras.length)];
     }
 
-    // Choose an empty cell (for sliding) that is NOT part of any placed word when possible
+    // Define espaço vazio
     const occupied = new Set(Object.values(placedPositions).flat());
     let emptyIdx = null;
     const candidates = [];
@@ -99,11 +100,9 @@ function buildGridWithPlacements(words, size = 5) {
     if (candidates.length > 0) {
         emptyIdx = candidates[Math.floor(Math.random() * candidates.length)];
     } else {
-        // fallback: pick a random index and remove any placed word that used it
         emptyIdx = Math.floor(Math.random() * grid.length);
         for (const w of Object.keys(placedPositions)) {
             if (placedPositions[w].includes(emptyIdx)) {
-                // unmark this word as placed
                 const idx = placedWords.indexOf(w);
                 if (idx !== -1) placedWords.splice(idx, 1);
                 delete placedPositions[w];
@@ -115,15 +114,11 @@ function buildGridWithPlacements(words, size = 5) {
     return { grid, placedWords, placedPositions };
 }
 
-// Build initial grid with placements
-const buildResult = buildGridWithPlacements(palavras, 5);
-let grid = buildResult.grid;
-// Keep track of which words were actually placed (formáveis)
-const palavrasColocadas = buildResult.placedWords || [];
-
-// Scramble the grid by simulating valid sliding moves from the placed state
+// ===============================
+// 4. EMBARALHAMENTO
+// ===============================
 function scrambleGrid(gridArr, size = 5) {
-    const moves = 50; // número de movimentos aleatórios
+    const moves = 50;
     let currentGrid = [...gridArr];
     let emptyIdx = currentGrid.indexOf('');
     
@@ -142,7 +137,6 @@ function scrambleGrid(gridArr, size = 5) {
         return res;
     }
 
-    // Faz vários movimentos aleatórios
     for (let i = 0; i < moves; i++) {
         const neigh = neighbors(emptyIdx);
         const pick = neigh[Math.floor(Math.random() * neigh.length)];
@@ -154,10 +148,48 @@ function scrambleGrid(gridArr, size = 5) {
     return currentGrid;
 }
 
-// scramble initial grid so it does not come solved
+// ===============================
+// 5. GARANTE LETRAS NECESSÁRIAS
+// ===============================
+function ensureLettersForWords(words, gridArr) {
+    const size = gridArr.length;
+    const letrasDisponiveis = gridArr.reduce((acc, letra) => {
+        if (letra && letra !== '') acc[letra] = (acc[letra] || 0) + 1;
+        return acc;
+    }, {});
+
+    const letrasNecessarias = {};
+    words.forEach(palavra => {
+        palavra.split('').forEach(letra => {
+            letrasNecessarias[letra] = (letrasNecessarias[letra] || 0) + 1;
+        });
+    });
+
+    for (const [letra, qtd] of Object.entries(letrasNecessarias)) {
+        const falta = qtd - (letrasDisponiveis[letra] || 0);
+        for (let i = 0; i < falta; i++) {
+            let idx = gridArr.findIndex(c => !letrasNecessarias[c] && c !== '');
+            if (idx === -1) idx = Math.floor(Math.random() * size);
+            gridArr[idx] = letra;
+        }
+    }
+
+    return gridArr;
+}
+
+// ===============================
+// 6. CRIAÇÃO E AJUSTE INICIAL DO GRID
+// ===============================
+const buildResult = buildGridWithPlacements(palavras, 5);
+let grid = buildResult.grid;
+const palavrasColocadas = buildResult.placedWords || [];
+
 grid = scrambleGrid(grid, 5);
 grid = ensureLettersForWords(palavras, grid);
 
+// ===============================
+// 7. RENDERIZAÇÃO E LÓGICA DO JOGO
+// ===============================
 async function renderGrid() {
     const gridEl = document.getElementById('grid');
     gridEl.innerHTML = "";
@@ -199,7 +231,6 @@ function onDrop(e) {
     }
 }
 function tryMove(idx) {
-    // Move para espaço vazio adjacente
     const emptyIdx = grid.indexOf('');
     const row = Math.floor(idx / 5), col = idx % 5;
     const emptyRow = Math.floor(emptyIdx / 5), emptyCol = emptyIdx % 5;
@@ -209,76 +240,50 @@ function tryMove(idx) {
         renderGrid();
     }
 }
-// Array para registrar palavras já encontradas
+
 let palavrasEncontradas = [];
 function showWords() {
     const wordEl = document.getElementById('word');
     let formed = [];
     const size = 5;
 
-    // Função para verificar se uma palavra está formada em sequência
     function verificaSequencia(arr, palavra) {
         for (let i = 0; i <= arr.length - palavra.length; i++) {
             let trecho = arr.slice(i, i + palavra.length);
-            if (trecho.join("") === palavra && !trecho.includes("")) {
-                return true;
-            }
+            if (trecho.join("") === palavra && !trecho.includes("")) return true;
         }
         return false;
     }
 
-    // Verifica palavras formadas e palavras formáveis
     let encontradaPalavra = {};
     palavras.forEach(palavra => {
-        // Primeiro verifica se a palavra está formada em sequência
         let formada = false;
-
-        // Horizontal
         for (let i = 0; i < size && !formada; i++) {
             let linha = grid.slice(i * size, (i + 1) * size);
-            if (verificaSequencia(linha, palavra)) {
-                formada = true;
-            }
+            if (verificaSequencia(linha, palavra)) formada = true;
         }
-
-        // Vertical
         for (let i = 0; i < size && !formada; i++) {
             let coluna = [];
-            for (let j = 0; j < size; j++) {
-                coluna.push(grid[j * size + i]);
-            }
-            if (verificaSequencia(coluna, palavra)) {
-                formada = true;
-            }
+            for (let j = 0; j < size; j++) coluna.push(grid[j * size + i]);
+            if (verificaSequencia(coluna, palavra)) formada = true;
         }
-
-        // Se a palavra está formada, marca como encontrada
         if (formada && !palavrasEncontradas.includes(palavra)) {
             palavrasEncontradas.push(palavra);
         }
-
-        // Verifica se a palavra é formável (tem todas as letras necessárias)
         const letrasNecessarias = palavra.split('').reduce((acc, letra) => {
             acc[letra] = (acc[letra] || 0) + 1;
             return acc;
         }, {});
-
         const letrasDisponiveis = grid.reduce((acc, letra) => {
-            if (letra !== '') {
-                acc[letra] = (acc[letra] || 0) + 1;
-            }
+            if (letra !== '') acc[letra] = (acc[letra] || 0) + 1;
             return acc;
         }, {});
-
-        // Uma palavra é formável se todas as suas letras estão disponíveis em quantidade suficiente
-        const formavel = Object.entries(letrasNecessarias).every(([letra, qtd]) => 
+        const formavel = Object.entries(letrasNecessarias).every(([letra, qtd]) =>
             (letrasDisponiveis[letra] || 0) >= qtd
         );
-
         encontradaPalavra[palavra] = formada || formavel;
     });
 
-    // Exibe todas as palavras formáveis (que têm letras suficientes) ou já encontradas
     const exibidas = palavras.filter(p => encontradaPalavra[p] || palavrasEncontradas.includes(p));
 
     exibidas.forEach(palavra => {
@@ -295,68 +300,38 @@ function showWords() {
         wordEl.innerHTML = '<b>Palavras para encontrar:</b> ' + formed.join(", ");
     }
 }
+
+// ===============================
+// 8. INICIALIZAÇÃO
+// ===============================
 window.onload = async () => {
     await renderGrid();
-    // localized restart label
     const lang = (document.documentElement.lang || navigator.language || 'pt').split('-')[0];
     const restartLabel = (lang === 'en') ? 'Restart' : 'Reiniciar';
     document.getElementById('reiniciar').textContent = restartLabel;
     document.querySelector('.fa-spinner').style.display = 'none';
-}
+};
 
-// Watch for language changes and re-render with new words
+// ===============================
+// 9. TROCA DE IDIOMA
+// ===============================
 const observer = new MutationObserver(mutations => {
     for (const m of mutations) {
         if (m.attributeName === 'lang') {
-            // rebuild word lists and grid for new language
             listaPalavras = getInitialWordsForLang();
             palavras = listaPalavras[0];
-            // rebuild grid placing words contiguously
             const res = buildGridWithPlacements(palavras, 5);
             grid = res.grid;
-            // track which words are actually colocadas (formáveis)
             palavrasColocadas.length = 0;
             if (res.placedWords) palavrasColocadas.push(...res.placedWords);
-            // reset found list (language change)
             palavrasEncontradas = [];
-            // scramble the grid
             grid = scrambleGrid(grid, 5);
             grid = ensureLettersForWords(palavras, grid);
             renderGrid();
-            // update restart label
             const newLang = (document.documentElement.lang || navigator.language || 'pt').split('-')[0];
             document.getElementById('reiniciar').textContent = (newLang === 'en') ? 'Restart' : 'Reiniciar';
             break;
         }
     }
 });
-// Garante que todas as palavras tenham suas letras disponíveis no grid
-function ensureLettersForWords(words, gridArr) {
-    const size = gridArr.length;
-    const letrasDisponiveis = gridArr.reduce((acc, letra) => {
-        if (letra && letra !== '') acc[letra] = (acc[letra] || 0) + 1;
-        return acc;
-    }, {});
-
-    // Conta letras necessárias para todas as palavras
-    const letrasNecessarias = {};
-    words.forEach(palavra => {
-        palavra.split('').forEach(letra => {
-            letrasNecessarias[letra] = (letrasNecessarias[letra] || 0) + 1;
-        });
-    });
-
-    // Reforça o grid com as letras que faltam
-    for (const [letra, qtd] of Object.entries(letrasNecessarias)) {
-        const falta = qtd - (letrasDisponiveis[letra] || 0);
-        for (let i = 0; i < falta; i++) {
-            // Substitui letras aleatórias que não pertencem às palavras
-            let idx = gridArr.findIndex(c => !letrasNecessarias[c] && c !== '');
-            if (idx === -1) idx = Math.floor(Math.random() * size); // fallback
-            gridArr[idx] = letra;
-        }
-    }
-
-    return gridArr;
-}
 observer.observe(document.documentElement, { attributes: true });
