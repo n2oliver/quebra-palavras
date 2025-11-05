@@ -156,6 +156,7 @@ function scrambleGrid(gridArr, size = 5) {
 
 // scramble initial grid so it does not come solved
 grid = scrambleGrid(grid, 5);
+grid = ensureLettersForWords(palavras, grid);
 
 async function renderGrid() {
     const gridEl = document.getElementById('grid');
@@ -320,6 +321,7 @@ const observer = new MutationObserver(mutations => {
             palavrasEncontradas = [];
             // scramble the grid
             grid = scrambleGrid(grid, 5);
+            grid = ensureLettersForWords(palavras, grid);
             renderGrid();
             // update restart label
             const newLang = (document.documentElement.lang || navigator.language || 'pt').split('-')[0];
@@ -328,4 +330,33 @@ const observer = new MutationObserver(mutations => {
         }
     }
 });
+// Garante que todas as palavras tenham suas letras disponíveis no grid
+function ensureLettersForWords(words, gridArr) {
+    const size = gridArr.length;
+    const letrasDisponiveis = gridArr.reduce((acc, letra) => {
+        if (letra && letra !== '') acc[letra] = (acc[letra] || 0) + 1;
+        return acc;
+    }, {});
+
+    // Conta letras necessárias para todas as palavras
+    const letrasNecessarias = {};
+    words.forEach(palavra => {
+        palavra.split('').forEach(letra => {
+            letrasNecessarias[letra] = (letrasNecessarias[letra] || 0) + 1;
+        });
+    });
+
+    // Reforça o grid com as letras que faltam
+    for (const [letra, qtd] of Object.entries(letrasNecessarias)) {
+        const falta = qtd - (letrasDisponiveis[letra] || 0);
+        for (let i = 0; i < falta; i++) {
+            // Substitui letras aleatórias que não pertencem às palavras
+            let idx = gridArr.findIndex(c => !letrasNecessarias[c] && c !== '');
+            if (idx === -1) idx = Math.floor(Math.random() * size); // fallback
+            gridArr[idx] = letra;
+        }
+    }
+
+    return gridArr;
+}
 observer.observe(document.documentElement, { attributes: true });
