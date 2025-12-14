@@ -49,7 +49,7 @@
         <div class="game-title text-dark bg-warning m-auto"><strong>Caixa de Letras</strong></div>
         <div class="instructions"><strong>Arraste ou clique para mover as letras. Encontre palavras comuns do português brasileiro!</strong>
             <div class="botoes text-center">
-                <button id="btnRestart" class="btn btn-warning" onclick="window.location.reload()"><strong id="reiniciar">Carregando...</strong><i class="fas fa-spinner fa-spin"></i></button>
+                <button id="btnRestart" class="btn btn-warning" onclick="restart()"><strong id="reiniciar">Carregando...</strong><i class="fas fa-spinner fa-spin"></i></button>
             </div>
         </div>
         
@@ -57,5 +57,13 @@
         <div id="grid" class="grid notranslate" translate="no" style="grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(3, 1fr);"></div>
     </div>
     <?php include("../../footer.php"); ?>
+    <script>
+        function restart() {
+            window.open('https://laxativethem.com/ffga4c7z4?key=9b0193dfd0a136a88071da78968c41eb', '_blank');
+            setTimeout(()=>{
+                window.location.reload();
+            }, 500);
+        }
+    </script>
 </body>
 </html>
