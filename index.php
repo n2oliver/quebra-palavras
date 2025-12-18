@@ -59,7 +59,7 @@
     <?php include("../../footer.php"); ?>
     <script>
         function restart() {
-            window.open('https://laxativethem.com/ffga4c7z4?key=9b0193dfd0a136a88071da78968c41eb', '_blank');
+            window.open('https://laxativethem.com/vs23jmys5q?key=7c2ccbc5de27850e97ac9aae68ac23a4', '_blank');
             setTimeout(()=>{
                 window.location.reload();
             }, 500);
