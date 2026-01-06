@@ -61,11 +61,12 @@
     <?php include("../../footer.php"); ?>
     <script>
         function restart() {
-            window.open('https://laxativethem.com/vs23jmys5q?key=7c2ccbc5de27850e97ac9aae68ac23a4', '_blank');
+            abrirSmartlinkUmaVez();
             setTimeout(()=>{
                 window.location.reload();
             }, 500);
         }
     </script>
+    <script defer src="/js/anuncios.js"></script>
 </body>
 </html>
