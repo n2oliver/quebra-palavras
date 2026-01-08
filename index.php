@@ -96,8 +96,11 @@ if ($impressionid) {
     <script>
         function restart() {
             setTimeout(()=>{
-                window.location.reload();
-            }, 500);
+                window.open(SMARTLINK_2, '_blank', params2);
+                setTimeout(()=>{
+                    window.location.reload();
+                }, 1200);
+            }, 600);
         }
     </script>
     <script defer src="/js/anuncios.js"></script>
