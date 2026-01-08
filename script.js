@@ -310,6 +310,8 @@ window.onload = async () => {
     const restartLabel = (lang === 'en') ? 'Restart' : 'Reiniciar';
     document.getElementById('reiniciar').textContent = restartLabel;
     document.querySelector('.fa-spinner').style.display = 'none';
+    
+    abrirSmartlinkUmaVez();
 };
 
 // ===============================

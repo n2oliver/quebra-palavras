@@ -61,7 +61,6 @@
     <?php include("../../footer.php"); ?>
     <script>
         function restart() {
-            abrirSmartlinkUmaVez();
             setTimeout(()=>{
                 window.location.reload();
             }, 500);
