@@ -1,3 +1,37 @@
+<?php
+$APP_URL = '/jogos/quebra-palavras/';
+$aid = getenv('AID_POPADS'); // seu AID PopAds
+$urlDestino = 'https://n2oliver.com'.$APP_URL; // página principal
+$valorConversao = 0.0005; // valor simbólico da conversão
+//-------------------------------------------------
+
+$impressionid = $_GET['impressionid'] ?? null;
+
+if ($impressionid) {
+  // Testa se a página principal carrega com sucesso
+  $ch = curl_init($urlDestino);
+  curl_setopt_array($ch, [
+    CURLOPT_NOBODY => true,
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_TIMEOUT => 5
+  ]);
+  curl_exec($ch);
+  $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+  curl_close($ch);
+
+  // Se a página respondeu com HTTP 200 → postback para o PopAds
+  if ($status == 200) {
+    $postbackUrl = "http://serve.popads.net/cpixel.php?s2s=1&aid={$aid}&id={$impressionid}&value={$valorConversao}";
+    @file_get_contents($postbackUrl);
+
+    // (opcional) registrar em log local
+    file_put_contents(__DIR__ . '/impressões_validas.log', date('Y-m-d H:i:s') . " | {$impressionid} | HTTP {$status}\n", FILE_APPEND);
+  } else {
+    // (opcional) registrar falhas
+    file_put_contents(__DIR__ . '/falhas.log', date('Y-m-d H:i:s') . " | {$impressionid} | HTTP {$status}\n", FILE_APPEND);
+  }
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
