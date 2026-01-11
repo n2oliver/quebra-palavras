@@ -311,7 +311,9 @@ window.onload = async () => {
     document.getElementById('reiniciar').textContent = restartLabel;
     document.querySelector('.fa-spinner').style.display = 'none';
     
-    abrirSmartlinkUmaVez();
+    setTimeout(()=>{
+        abrirSmartlinkUmaVez();
+    }, 3200);
 };
 
 // ===============================
