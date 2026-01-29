@@ -313,7 +313,7 @@ window.onload = async () => {
     
     setTimeout(()=>{
         abrirSmartlinkUmaVez();
-    }, 3200);
+    }, 30000);
 };
 
 // ===============================
