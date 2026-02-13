@@ -58,6 +58,8 @@ if ($impressionid) {
             a.appendChild(r);
         })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
     </script>
+    
+    <script src="https://laxativethem.com/f0/b1/79/f0b17922dcf7861be67a02cba8a9b7ee.js"></script>
 </head>
 <body>
     <script async src="https://appsha-pnd.ctengine.io/js/script.js?wkey=97NjKiTr7b"></script>
@@ -86,7 +88,7 @@ if ($impressionid) {
         <div class="game-title text-dark bg-warning m-auto"><strong>Caixa de Letras</strong></div>
         <div class="instructions"><strong>Arraste ou clique para mover as letras. Encontre palavras comuns do português brasileiro!</strong>
             <div class="botoes text-center">
-                <button id="btnRestart" class="btn btn-warning" onclick="restart()"><strong id="reiniciar">Carregando...</strong><i class="fas fa-spinner fa-spin"></i></button>
+                <button id="btnRestart" class="btn btn-warning" onclick="restart(event)"><strong id="reiniciar">Carregando...</strong><i class="fas fa-spinner fa-spin"></i></button>
             </div>
         </div>
         
@@ -95,7 +97,9 @@ if ($impressionid) {
     </div>
     <?php include("../../footer.php"); ?>
     <script>
-        function restart() {
+        function restart(event) {
+            event.preventDefault();            
+            abrirSmartlinkUmaVez();
             setTimeout(()=>{
                 window.open(SMARTLINK_2, '_blank', params2);
                 setTimeout(()=>{
@@ -104,5 +108,7 @@ if ($impressionid) {
             }, 600);
         }
     </script>
+    
+    <script defer src="/js/anuncios.js"></script>
 </body>
 </html>
