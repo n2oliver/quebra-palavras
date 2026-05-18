@@ -59,12 +59,10 @@ if ($impressionid) {
         })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
     </script>
     
-    <script src="https://laxativethem.com/f0/b1/79/f0b17922dcf7861be67a02cba8a9b7ee.js"></script>
 </head>
 <body>
     <script async src="https://appsha-pnd.ctengine.io/js/script.js?wkey=97NjKiTr7b"></script>
 
-  <script src="/js/anuncios.js"></script>
     <div id="frame" style="width: 100%;margin: auto;position: relative; z-index: 99998;">
         <iframe data-aa='2412101' src='//acceptable.a-ads.com/2412101/?size=Adaptive'
                         style='border:0; padding:0; width:70%; height:auto; overflow:hidden;display: block;margin: auto'></iframe>
